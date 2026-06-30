@@ -29,6 +29,10 @@ github release、archive以及项目文件的加速项目，支持clone，Cloudf
 
 - release文件：https://github.com/hunshcn/project/releases/download/v0.1.0/example.zip
 
+- Actions artifact：https://github.com/hunshcn/project/actions/runs/123/artifacts/456
+
+- Actions suites artifact：https://github.com/hunshcn/project/suites/123/artifacts/456
+
 - 分支文件：https://github.com/hunshcn/project/blob/master/filename
 
 - commit文件：https://github.com/hunshcn/project/blob/1111111111111111111111111111/filename
