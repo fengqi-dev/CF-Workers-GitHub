@@ -33,11 +33,20 @@ github release、archive以及项目文件的加速项目，支持clone，Cloudf
 
 - Actions suites artifact：https://github.com/hunshcn/project/suites/123/artifacts/456
 
+- codeload归档直链：https://codeload.github.com/hunshcn/project/zip/refs/heads/master
+
+- release点击后直链：https://release-assets.githubusercontent.com/github-production-release-asset/123/example.zip
+
+- Actions点击后临时直链：https://productionresultssa1.blob.core.windows.net/actions-results/xxx/artifacts/example.zip
+
 - 分支文件：https://github.com/hunshcn/project/blob/master/filename
 
 - commit文件：https://github.com/hunshcn/project/blob/1111111111111111111111111111/filename
 
 - gist：https://gist.githubusercontent.com/cielpy/351557e6e465c12986419ac5a4dd2568/raw/cmd.py
+
+> [!NOTE]
+> 点击后直链通常包含临时签名参数，可能会过期；如直链失效，请重新从 GitHub 页面点击下载后复制新的链接。
 
 ## 📄 Pages Github 部署
 

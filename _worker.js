@@ -28,6 +28,7 @@ const exp4 = /^(?:https?:\/\/)?raw\.(?:githubusercontent|github)\.com\/.+?\/.+?\
 const exp5 = /^(?:https?:\/\/)?gist\.(?:githubusercontent|github)\.com\/.+?\/.+?\/.+$/i // 匹配Gist的路径
 const exp6 = /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/tags.*$/i // 匹配GitHub的tags路径
 const exp7 = /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/(?:actions\/runs\/.+?\/artifacts\/.+|suites\/.+?\/artifacts\/.+).*$/i // 匹配GitHub Actions artifacts下载路由
+const exp8 = /^(?:https?:\/\/)?(?:codeload\.github\.com\/.+?\/.+?\/(?:zip|tar\.gz|legacy\.zip|legacy\.tar\.gz)\/.+|(?:objects|release-assets)\.githubusercontent\.com\/github-production-(?:release-asset|repository-file|user-asset).*|github-releases\.githubusercontent\.com\/.+|productionresultssa[0-9]+\.blob\.core\.windows\.net\/actions-results\/.+|[\w.-]+\.actions\.githubusercontent\.com\/.+\/_apis\/pipelines\/.+\/signedartifactscontent.*)$/i // 匹配点击下载后的GitHub直链路由
 
 /**
  * 创建响应对象
@@ -57,7 +58,7 @@ function newUrl(urlStr) {
  * @param {string} u - 待检查的URL
  */
 function checkUrl(u) {
-	for (let i of [exp1, exp2, exp3, exp4, exp5, exp6, exp7]) {
+	for (let i of [exp1, exp2, exp3, exp4, exp5, exp6, exp7, exp8]) {
 		if (u.search(i) === 0) {
 			return true // 如果匹配，返回true
 		}
@@ -192,7 +193,7 @@ export default {
 		}
 		// cfworker 会把路径中的 `//` 合并成 `/`
 		path = urlObj.href.substr(urlObj.origin.length + PREFIX.length).replace(/^https?:\/+/, 'https://')
-		if (path.search(exp1) === 0 || path.search(exp5) === 0 || path.search(exp6) === 0 || path.search(exp3) === 0 || path.search(exp4) === 0 || path.search(exp7) === 0) {
+		if (path.search(exp1) === 0 || path.search(exp5) === 0 || path.search(exp6) === 0 || path.search(exp3) === 0 || path.search(exp4) === 0 || path.search(exp7) === 0 || path.search(exp8) === 0) {
 			return httpHandler(request, path) // 处理符合正则的请求
 		} else if (path.search(exp2) === 0) {
 			if (Config.jsdelivr) {
@@ -495,7 +496,7 @@ async function githubInterface() {
 						class="search-input"
 						name="q" 
 						placeholder="请输入 GitHub 文件链接"
-						pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:(?:releases|archive|blob|raw)\/.+|actions\/runs\/.+?\/artifacts\/.+|suites\/.+?\/artifacts\/.+)|((?:raw|gist)\.(?:githubusercontent|github)\.com)\/.+)$" 
+						pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:(?:releases|archive|blob|raw)\/.+|actions\/runs\/.+?\/artifacts\/.+|suites\/.+?\/artifacts\/.+)|((?:raw|gist)\.(?:githubusercontent|github)\.com)\/.+|codeload\.github\.com\/.+?\/.+?\/(?:zip|tar\.gz|legacy\.zip|legacy\.tar\.gz)\/.+|(?:objects|release-assets|github-releases)\.githubusercontent\.com\/.+|productionresultssa[0-9]+\.blob\.core\.windows\.net\/actions-results\/.+|[A-Za-z0-9.-]+\.actions\.githubusercontent\.com\/.+\/_apis\/pipelines\/.+\/signedartifactscontent.*)$" 
 						required
 					>
 					<button type="submit" class="search-button">
@@ -507,7 +508,7 @@ async function githubInterface() {
 
 				<div class="tips">
 					<p>✨ 支持带协议头(https://)或不带的GitHub链接，更多用法见<a href="https://hunsh.net/archives/23/">文档说明</a></p>
-					<p>🚀 release、archive、Actions artifacts下载路由使用cf加速，分支文件可按配置跳转至JsDelivr</p>
+					<p>🚀 release、archive、Actions artifacts及点击后的直链下载路由使用cf加速，分支文件可按配置跳转至JsDelivr</p>
 					<p>⚠️ 注意：暂不支持文件夹下载</p>
 				</div>
 
@@ -518,6 +519,7 @@ async function githubInterface() {
 					<p>📂 release文件：<span class="url-part">github.com/hunshcn/project/releases/download/v0.1.0/example.zip</span></p>
 					<p>💾 commit文件：<span class="url-part">github.com/hunshcn/project/blob/123/filename</span></p>
 					<p>🧩 Actions artifact：<span class="url-part">github.com/hunshcn/project/actions/runs/123/artifacts/456</span></p>
+					<p>🔗 点击后直链：<span class="url-part">release-assets.githubusercontent.com/github-production-release-asset/123/example.zip</span></p>
 					<p>🖨️ gist：<span class="url-part">gist.githubusercontent.com/cielpy/123/raw/cmd.py</span></p>
 				</div>
 			</div>
