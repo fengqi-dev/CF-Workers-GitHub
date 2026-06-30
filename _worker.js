@@ -495,7 +495,7 @@ async function githubInterface() {
 						class="search-input"
 						name="q" 
 						placeholder="请输入 GitHub 文件链接"
-						pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:releases|archive|blob|raw|suites|actions)|((?:raw|gist)\.(?:githubusercontent|github)\.com))\/.+$" 
+						pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:(?:releases|archive|blob|raw)\/.+|actions\/runs\/.+?\/artifacts\/.+|suites\/.+?\/artifacts\/.+)|((?:raw|gist)\.(?:githubusercontent|github)\.com)\/.+)$" 
 						required
 					>
 					<button type="submit" class="search-button">
