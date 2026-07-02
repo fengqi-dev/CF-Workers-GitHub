@@ -364,6 +364,10 @@ async function githubInterface() {
 					text-align: left;
 				}
 
+				.search-input-wrap {
+					position: relative;
+				}
+
 				.field-label {
 					display: flex;
 					align-items: center;
@@ -377,7 +381,7 @@ async function githubInterface() {
 				.search-input {
 					width: 100%;
 					height: 60px;
-					padding: 0 20px;
+					padding: 0 68px 0 20px;
 					font-size: 1rem;
 					color: var(--foreground);
 					background: var(--background);
@@ -398,59 +402,32 @@ async function githubInterface() {
 					box-shadow: 0 0 0 3px rgba(2, 8, 23, 0.12);
 				}
 
-				.mode-tabs {
-					display: grid;
-					grid-template-columns: repeat(3, minmax(0, 1fr));
-					gap: 8px;
-					margin-top: 16px;
-				}
-
-				.mode-tab {
-					height: 46px;
-					border: 1px solid var(--border);
-					border-radius: var(--radius);
-					background: var(--background);
-					color: var(--secondary-foreground);
-					cursor: pointer;
-					font-size: 0.95rem;
-					font-weight: 600;
-					box-shadow: var(--shadow);
-					transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-				}
-
-				.mode-tab:hover {
-					background: var(--muted);
-				}
-
-				.mode-tab.active {
-					background: var(--primary);
-					border-color: var(--primary);
-					color: var(--primary-foreground);
-					box-shadow: 0 8px 20px rgba(59, 130, 246, 0.24);
-				}
-
-				.convert-button {
-					width: 100%;
-					height: 54px;
-					margin-top: 20px;
+				.search-button {
+					position: absolute;
+					right: 10px;
+					top: 50%;
+					transform: translateY(-50%);
+					width: 40px;
+					height: 40px;
 					border: none;
-					border-radius: var(--radius);
+					border-radius: calc(var(--radius) - 2px);
 					background: var(--primary);
 					color: var(--primary-foreground);
 					cursor: pointer;
-					font-size: 1rem;
-					font-weight: 700;
-					box-shadow: 0 10px 24px rgba(59, 130, 246, 0.26);
-					transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					box-shadow: var(--shadow);
+					transition: background 0.2s ease, transform 0.2s ease;
 				}
 
-				.convert-button:hover {
+				.search-button:hover {
 					background: #2563eb;
-					box-shadow: 0 14px 30px rgba(37, 99, 235, 0.3);
+					transform: translateY(-50%) scale(1.02);
 				}
 
-				.convert-button:active {
-					transform: translateY(1px);
+				.search-button:active {
+					transform: translateY(-50%) scale(0.98);
 				}
 
 				.url-preview {
@@ -481,14 +458,6 @@ async function githubInterface() {
 
 				.url-preview a:hover {
 					text-decoration: underline;
-				}
-
-				.url-preview pre {
-					margin: 0;
-					white-space: pre-wrap;
-					word-break: break-all;
-					font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-					color: var(--foreground);
 				}
 
 				.tips {
@@ -651,15 +620,12 @@ async function githubInterface() {
 					.search-input {
 						height: 56px;
 						font-size: 0.9rem;
-						padding: 0 16px;
+						padding: 0 62px 0 16px;
 					}
 
-					.mode-tabs {
-						grid-template-columns: 1fr;
-					}
-
-					.mode-tab {
-						height: 42px;
+					.search-button {
+						width: 36px;
+						height: 36px;
 					}
 
 					.url-preview {
@@ -717,21 +683,22 @@ async function githubInterface() {
 						
 						<form onsubmit="toSubmit(event)" class="search-container">
 							<label class="field-label" for="githubUrl">🔗 GitHub 链接</label>
+							<div class="search-input-wrap">
 							<input 
 								id="githubUrl"
 								type="text" 
 								class="search-input"
 								name="q" 
-								placeholder="输入 GitHub 链接，例如：https://github.com/sky22333/hubproxy"
-								pattern="^((https|http):\/\/)?((github\.com|raw\.(githubusercontent|github)\.com|gist\.(githubusercontent|github)\.com)\/).+$" 
+								placeholder="请输入 GitHub 文件链接，例如 github.com/user/repo/archive/main.zip"
+								pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:releases|archive|blob|raw|suites)|((?:raw|gist)\.(?:githubusercontent|github)\.com))\/.+$" 
 								required
 							>
-							<div class="mode-tabs" role="tablist" aria-label="转换方式">
-								<button type="button" class="mode-tab active" data-mode="original">原始链接</button>
-								<button type="button" class="mode-tab" data-mode="clone">Git Clone</button>
-								<button type="button" class="mode-tab" data-mode="download">Wget / cURL</button>
+							<button type="submit" class="search-button" aria-label="开始加速">
+								<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+									<path d="M13 5l7 7-7 7M5 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</button>
 							</div>
-							<button type="submit" class="convert-button">⚡ 转换链接</button>
 						</form>
 
 						<div class="url-preview" id="urlPreview">
@@ -760,100 +727,45 @@ async function githubInterface() {
 			</div>
 
 			<script>
-				let activeMode = 'original';
-
 				function getBaseUrl() {
 					return location.href.substr(0, location.href.lastIndexOf('/') + 1);
 				}
 
-				function normalizeInput(value) {
-					return value.trim().replace(/^\/+/, '');
-				}
-
-				function getAcceleratedUrl(value) {
+				function getPreviewUrl(value) {
 					const path = value.trim();
-					return path ? getBaseUrl() + normalizeInput(path) : '';
-				}
-
-				function getGitCloneUrl(value) {
-					const normalized = normalizeInput(value).replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-					const repoMatch = normalized.match(/^github\.com\/([^/]+\/[^/.]+)(?:\.git)?(?:\/)?$/i);
-					const path = repoMatch ? 'github.com/' + repoMatch[1] + '.git' : normalized;
 					return path ? getBaseUrl() + path : '';
-				}
-
-				function getFileName(value) {
-					const cleanValue = normalizeInput(value).split(/[?#]/)[0].replace(/\/+$/, '');
-					const name = cleanValue.substring(cleanValue.lastIndexOf('/') + 1);
-					return name || 'download';
-				}
-
-				function getOutput(value) {
-					if (activeMode === 'clone') {
-						const url = getGitCloneUrl(value);
-						return {
-							title: 'Git Clone 命令',
-							text: url ? 'git clone ' + url : '',
-							type: 'code',
-						};
-					}
-
-					const url = getAcceleratedUrl(value);
-					if (activeMode === 'download') {
-						const fileName = getFileName(value);
-						return {
-							title: 'Wget / cURL 命令',
-							text: url ? 'wget -O "' + fileName + '" "' + url + '"\\n' + 'curl -L -o "' + fileName + '" "' + url + '"' : '',
-							type: 'code',
-						};
-					}
-
-					return {
-						title: '生成后的 URL',
-						text: url,
-						type: 'link',
-					};
 				}
 
 				function updateUrlPreview() {
 					const input = document.getElementsByName('q')[0];
 					const preview = document.getElementById('urlPreview');
-					const output = getOutput(input.value);
+					const url = getPreviewUrl(input.value);
 
 					const title = document.createElement('strong');
-					title.textContent = output.title;
+					title.textContent = '生成后的 URL';
 
-					if (output.text && output.type === 'link') {
+					if (url) {
 						const link = document.createElement('a');
-						link.href = output.text;
+						link.href = url;
 						link.target = '_blank';
 						link.rel = 'noopener noreferrer';
-						link.textContent = output.text;
+						link.textContent = url;
 						preview.replaceChildren(title, link);
-					} else if (output.text) {
-						const code = document.createElement('pre');
-						code.textContent = output.text;
-						preview.replaceChildren(title, code);
 					} else {
 						const placeholder = document.createElement('span');
-						placeholder.textContent = '输入 GitHub 链接后将在这里显示';
+						placeholder.textContent = '输入 GitHub 文件链接后将在这里显示';
 						preview.replaceChildren(title, placeholder);
 					}
 				}
 
 				function toSubmit(e) {
 					e.preventDefault();
-					updateUrlPreview();
+					const input = document.getElementsByName('q')[0];
+					const url = getPreviewUrl(input.value);
+					if (url) window.open(url);
 				}
 
 				document.getElementsByName('q')[0].addEventListener('input', updateUrlPreview);
-				document.querySelectorAll('.mode-tab').forEach(button => {
-					button.addEventListener('click', () => {
-						activeMode = button.dataset.mode;
-						document.querySelectorAll('.mode-tab').forEach(item => item.classList.toggle('active', item === button));
-						updateUrlPreview();
-					});
-				});
 				updateUrlPreview();
 			</script>
 		</body>
