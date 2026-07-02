@@ -237,16 +237,23 @@ async function githubInterface() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 			<style>
 				:root {
-					--primary-color: #0d1117;
-					--secondary-color: #161b22;
-					--text-color: #f0f6fc;
-					--accent-color: #58a6ff;
-					--gradient-start: #24292e;
-					--gradient-end: #0d1117;
-					--shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-					--border-color: rgba(255, 255, 255, 0.1);
-					--github-corner-bg: #f0f6fc;
-					--github-corner-fg: rgb(21,26,31);
+					--background: #ffffff;
+					--foreground: #020817;
+					--card: #ffffff;
+					--card-foreground: #020817;
+					--muted: #f8fafc;
+					--muted-foreground: #64748b;
+					--primary: #3b82f6;
+					--primary-foreground: #f8fafc;
+					--secondary: #f1f5f9;
+					--secondary-foreground: #0f172a;
+					--border: #e2e8f0;
+					--input: #e2e8f0;
+					--ring: #3b82f6;
+					--radius: 0.75rem;
+					--shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+					--github-corner-bg: #020817;
+					--github-corner-fg: #ffffff;
 				}
 
 				* {
@@ -258,137 +265,317 @@ async function githubInterface() {
 				body {
 					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 					min-height: 100vh;
-					background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-					color: var(--text-color);
+					background:
+						radial-gradient(circle at top left, rgba(15, 23, 42, 0.05), transparent 34%),
+						linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+					color: var(--foreground);
 					display: flex;
 					justify-content: center;
-					align-items: center;
-					padding: 20px;
+					align-items: flex-start;
+					padding: 56px 20px;
+					position: relative;
+					overflow-x: hidden;
+				}
+
+				body::before {
+					content: "";
+					position: fixed;
+					inset: 0;
+					pointer-events: none;
+					background-image:
+						linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+						linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+					background-size: 42px 42px;
+					mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 78%);
 				}
 
 				.container {
 					width: 100%;
-					max-width: 800px;
-					padding: 40px 20px;
+					max-width: 920px;
+					padding: 24px 0;
 					text-align: center;
+					position: relative;
+					z-index: 1;
+				}
+
+				.hero-card {
+					background: var(--card);
+					border: 1px solid var(--border);
+					border-radius: calc(var(--radius) + 0.5rem);
+					box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+					padding: 46px;
+					overflow: hidden;
+					position: relative;
+				}
+
+				.hero-card::before {
+					content: "";
+					position: absolute;
+					inset: 0;
+					background:
+						linear-gradient(180deg, rgba(248, 250, 252, 0.72), transparent 52%),
+						radial-gradient(circle at 50% 0%, rgba(15, 23, 42, 0.05), transparent 42%);
+					pointer-events: none;
+				}
+
+				.hero-content {
+					position: relative;
+					z-index: 1;
 				}
 
 				.title {
-					font-size: 2.5rem;
-					font-weight: 600;
-					margin-bottom: 1.5rem;
-					color: var(--text-color);
+					font-size: clamp(2.25rem, 6vw, 4.5rem);
+					font-weight: 800;
+					margin-bottom: 0.9rem;
+					color: var(--foreground);
 					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-					letter-spacing: -0.5px;
+					letter-spacing: -1.5px;
+					line-height: 1.05;
 				}
 
 				.title .emoji {
 					display: inline-block;
-					color: #f1fa8c;
-					margin-right: 8px;
+					margin-right: 12px;
+				}
+
+				.subtitle {
+					max-width: 640px;
+					margin: 0 auto;
+					color: var(--muted-foreground);
+					font-size: 1.08rem;
+					line-height: 1.8;
 				}
 
 				.tips a {
-					color: var(--accent-color);
+					color: var(--foreground);
 					text-decoration: none;
-					border-bottom: 1px dashed rgba(88, 166, 255, 0.5);
+					border-bottom: 1px solid var(--border);
 					transition: all 0.2s ease;
 				}
 
 				.tips a:hover {
-					color: #a2d2ff;
-					border-bottom-color: #a2d2ff;
+					color: var(--muted-foreground);
+					border-bottom-color: var(--foreground);
 				}
 
 				.search-container {
-					position: relative;
-					max-width: 600px;
-					margin: 2rem auto;
+					max-width: 720px;
+					margin: 2.4rem auto 1.4rem;
+					text-align: left;
+				}
+
+				.field-label {
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					margin-bottom: 12px;
+					color: var(--foreground);
+					font-size: 0.95rem;
+					font-weight: 600;
 				}
 
 				.search-input {
 					width: 100%;
-					height: 56px;
-					padding: 0 60px 0 24px;
+					height: 60px;
+					padding: 0 20px;
 					font-size: 1rem;
-					color: #1f2937;
-					background: rgba(255, 255, 255, 0.95);
-					border: 2px solid transparent;
-					border-radius: 12px;
+					color: var(--foreground);
+					background: var(--background);
+					border: 1px solid var(--input);
+					border-radius: var(--radius);
 					box-shadow: var(--shadow);
-					transition: all 0.3s ease;
+					transition: border-color 0.2s ease, box-shadow 0.2s ease;
+				}
+
+				.search-input::placeholder {
+					color: var(--muted-foreground);
 				}
 
 				.search-input:focus {
-					border-color: var(--accent-color);
-					background: white;
+					border-color: var(--ring);
+					background: var(--background);
 					outline: none;
-					box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+					box-shadow: 0 0 0 3px rgba(2, 8, 23, 0.12);
 				}
 
-				.search-button {
-					position: absolute;
-					right: 8px;
-					top: 50%;
-					transform: translateY(-50%);
-					width: 44px;
-					height: 44px;
-					border: none;
-					border-radius: 8px;
-					background: var(--accent-color);
-					color: white;
+				.mode-tabs {
+					display: grid;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					gap: 8px;
+					margin-top: 16px;
+				}
+
+				.mode-tab {
+					height: 46px;
+					border: 1px solid var(--border);
+					border-radius: var(--radius);
+					background: var(--background);
+					color: var(--secondary-foreground);
 					cursor: pointer;
-					transition: all 0.2s ease;
+					font-size: 0.95rem;
+					font-weight: 600;
+					box-shadow: var(--shadow);
+					transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 				}
 
-				.search-button:hover {
-					background: #4187d7;
-					transform: translateY(-50%) scale(1.05);
+				.mode-tab:hover {
+					background: var(--muted);
+				}
+
+				.mode-tab.active {
+					background: var(--primary);
+					border-color: var(--primary);
+					color: var(--primary-foreground);
+					box-shadow: 0 8px 20px rgba(59, 130, 246, 0.24);
+				}
+
+				.convert-button {
+					width: 100%;
+					height: 54px;
+					margin-top: 20px;
+					border: none;
+					border-radius: var(--radius);
+					background: var(--primary);
+					color: var(--primary-foreground);
+					cursor: pointer;
+					font-size: 1rem;
+					font-weight: 700;
+					box-shadow: 0 10px 24px rgba(59, 130, 246, 0.26);
+					transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+				}
+
+				.convert-button:hover {
+					background: #2563eb;
+					box-shadow: 0 14px 30px rgba(37, 99, 235, 0.3);
+				}
+
+				.convert-button:active {
+					transform: translateY(1px);
+				}
+
+				.url-preview {
+					max-width: 720px;
+					margin: -0.4rem auto 1.4rem;
+					padding: 14px 16px;
+					border: 1px solid var(--border);
+					border-radius: var(--radius);
+					background: var(--muted);
+					color: var(--muted-foreground);
+					font-size: 0.92rem;
+					line-height: 1.55;
+					text-align: left;
+					word-break: break-all;
+				}
+
+				.url-preview strong {
+					display: block;
+					margin-bottom: 4px;
+					color: var(--foreground);
+					font-size: 0.84rem;
+				}
+
+				.url-preview a {
+					color: var(--foreground);
+					text-decoration: none;
+				}
+
+				.url-preview a:hover {
+					text-decoration: underline;
+				}
+
+				.url-preview pre {
+					margin: 0;
+					white-space: pre-wrap;
+					word-break: break-all;
+					font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+					color: var(--foreground);
 				}
 
 				.tips {
-					margin-top: 2rem;
-					color: rgba(240, 246, 252, 0.8);
+					display: grid;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					gap: 14px;
+					margin-top: 1.5rem;
+					color: var(--muted-foreground);
 					line-height: 1.6;
 					text-align: left;
-					padding-left: 1.8rem;
+				}
+
+				.tips p {
+					min-height: 92px;
+					padding: 18px;
+					background: var(--background);
+					border: 1px solid var(--border);
+					border-radius: var(--radius);
+					box-shadow: var(--shadow);
+				}
+
+				.badge {
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					margin-bottom: 1rem;
+					padding: 6px 10px;
+					border: 1px solid var(--border);
+					border-radius: 999px;
+					background: var(--secondary);
+					color: var(--secondary-foreground);
+					font-size: 0.84rem;
+					font-weight: 600;
 				}
 
 				.example-title {
-					color: var(--accent-color);
-					margin-bottom: 1.5rem;
-					font-size: 1.1rem;
-					font-weight: 600;
+					color: var(--foreground);
+					margin-bottom: 1.2rem;
+					font-size: 1.18rem;
+					font-weight: 700;
 					position: relative;
-					padding-bottom: 0.8rem;
-					border-bottom: 1px solid var(--border-color);
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					gap: 12px;
+				}
+
+				.example-title span {
+					color: var(--muted-foreground);
+					font-size: 0.88rem;
+					font-weight: 500;
 				}
 
 				.example p {
-					margin: 0.9rem 0;
+					margin: 0;
 					font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 					font-size: 0.95rem;
-					color: rgba(240, 246, 252, 0.9);
-					padding-left: 1.5rem;
-					line-height: 1.4;
+					color: var(--foreground);
+					padding: 14px 16px;
+					line-height: 1.45;
 					word-wrap: break-word;
 					word-break: break-all;
 					overflow-wrap: break-word;
+					background: var(--muted);
+					border: 1px solid var(--border);
+					border-radius: calc(var(--radius) - 2px);
 				}
 
 				.example {
 					margin-top: 2.5rem;
-					padding: 1.8rem;
-					background: rgba(255, 255, 255, 0.05);
-					border-radius: 12px;
+					padding: 1.6rem;
+					background: var(--card);
+					border-radius: calc(var(--radius) + 0.25rem);
 					text-align: left;
-					border: 1px solid var(--border-color);
-					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+					border: 1px solid var(--border);
+					box-shadow: var(--shadow);
 					overflow-x: auto;
 				}
 
+				.example-list {
+					display: grid;
+					gap: 12px;
+				}
+
 				.url-part {
-					color: var(--accent-color);
+					color: var(--foreground);
+					font-weight: 600;
 				}
 
 				.github-corner {
@@ -422,7 +609,7 @@ async function githubInterface() {
 
 				.github-corner .octo-body,
 				.github-corner .octo-arm {
-					fill: var(--github-corner-fg) !重要;
+					fill: var(--github-corner-fg) !important;
 				}
 
 				.github-corner:hover .octo-arm {
@@ -436,37 +623,73 @@ async function githubInterface() {
 				}
 
 				@media (max-width: 640px) {
+					body {
+						padding: 26px 14px;
+					}
+
 					.container {
-						padding: 20px;
+						padding: 18px 0;
+					}
+
+					.hero-card {
+						padding: 30px 18px;
+						border-radius: 22px;
 					}
 
 					.title {
 						font-size: 2rem;
 					}
 
-					.search-input {
-						height: 50px;
-						font-size: 0.9rem;
+					.subtitle {
+						font-size: 0.96rem;
 					}
 
-					.search-button {
-						width: 38px;
-						height: 38px;
+					.search-container {
+						margin-top: 1.8rem;
+					}
+
+					.search-input {
+						height: 56px;
+						font-size: 0.9rem;
+						padding: 0 16px;
+					}
+
+					.mode-tabs {
+						grid-template-columns: 1fr;
+					}
+
+					.mode-tab {
+						height: 42px;
+					}
+
+					.url-preview {
+						margin-top: -0.5rem;
+						font-size: 0.84rem;
+					}
+
+					.tips {
+						grid-template-columns: 1fr;
+					}
+
+					.tips p {
+						min-height: 0;
+						padding: 15px;
 					}
 
 					.example {
 						padding: 1rem;
+						border-radius: 18px;
 					}
 					
 					.example p {
 						font-size: 0.85rem;
-						padding-left: 0.8rem;
-						margin: 0.7rem 0;
+						padding: 12px;
 					}
 					
 					.example-title {
 						font-size: 0.95rem;
-						padding-bottom: 0.6rem;
+						align-items: flex-start;
+						flex-direction: column;
 					}
 					
 					.github-corner svg {
@@ -486,47 +709,152 @@ async function githubInterface() {
 			</a>
 			
 			<div class="container">
-				<h1 class="title"><span class="emoji">📦</span>GitHub 文件加速</h1>
-				
-				<form onsubmit="toSubmit(event)" class="search-container">
-					<input 
-						type="text" 
-						class="search-input"
-						name="q" 
-						placeholder="请输入 GitHub 文件链接"
-						pattern="^((https|http):\/\/)?(github\.com\/.+?\/.+?\/(?:releases|archive|blob|raw|suites)|((?:raw|gist)\.(?:githubusercontent|github)\.com))\/.+$" 
-						required
-					>
-					<button type="submit" class="search-button">
-						<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-							<path d="M13 5l7 7-7 7M5 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-					</button>
-				</form>
+				<div class="hero-card">
+					<div class="hero-content">
+						<div class="badge">⚡ Cloudflare Workers 加速</div>
+						<h1 class="title"><span class="emoji">📦</span>GitHub 文件加速</h1>
+						<p class="subtitle">粘贴 GitHub release、archive、raw、blob 或 gist 链接，即可生成更适合国内访问的加速地址。</p>
+						
+						<form onsubmit="toSubmit(event)" class="search-container">
+							<label class="field-label" for="githubUrl">🔗 GitHub 链接</label>
+							<input 
+								id="githubUrl"
+								type="text" 
+								class="search-input"
+								name="q" 
+								placeholder="输入 GitHub 链接，例如：https://github.com/sky22333/hubproxy"
+								pattern="^((https|http):\/\/)?((github\.com|raw\.(githubusercontent|github)\.com|gist\.(githubusercontent|github)\.com)\/).+$" 
+								required
+							>
+							<div class="mode-tabs" role="tablist" aria-label="转换方式">
+								<button type="button" class="mode-tab active" data-mode="original">原始链接</button>
+								<button type="button" class="mode-tab" data-mode="clone">Git Clone</button>
+								<button type="button" class="mode-tab" data-mode="download">Wget / cURL</button>
+							</div>
+							<button type="submit" class="convert-button">⚡ 转换链接</button>
+						</form>
 
-				<div class="tips">
-					<p>✨ 支持带协议头(https://)或不带的GitHub链接，更多用法见<a href="https://hunsh.net/archives/23/">文档说明</a></p>
-					<p>🚀 release、archive使用cf加速，文件会跳转至JsDelivr</p>
-					<p>⚠️ 注意：暂不支持文件夹下载</p>
+						<div class="url-preview" id="urlPreview">
+							<strong>生成后的 URL</strong>
+							<span>输入 GitHub 文件链接后将在这里显示</span>
+						</div>
+
+						<div class="tips">
+							<p>✨ 支持带协议头(https://)或不带协议头的 GitHub 链接，更多用法见 <a href="https://hunsh.net/archives/23/">文档说明</a></p>
+							<p>🚀 release、archive 使用 CF 加速，文件可按配置跳转至 JsDelivr</p>
+							<p>⚠️ 当前暂不支持文件夹下载，请输入具体文件、压缩包或 raw 链接</p>
+						</div>
+					</div>
 				</div>
 
 				<div class="example">
-					<div class="example-title">📃 合法输入示例：</div>
-					<p>📄 分支源码：<span class="url-part">github.com/hunshcn/project/archive/master.zip</span></p>
-					<p>📁 release源码：<span class="url-part">github.com/hunshcn/project/archive/v0.1.0.tar.gz</span></p>
-					<p>📂 release文件：<span class="url-part">github.com/hunshcn/project/releases/download/v0.1.0/example.zip</span></p>
-					<p>💾 commit文件：<span class="url-part">github.com/hunshcn/project/blob/123/filename</span></p>
-					<p>🖨️ gist：<span class="url-part">gist.githubusercontent.com/cielpy/123/raw/cmd.py</span></p>
+					<div class="example-title">📃 合法输入示例 <span>复制任意一类链接到上方输入框</span></div>
+					<div class="example-list">
+						<p>📄 分支源码：<span class="url-part">github.com/hunshcn/project/archive/master.zip</span></p>
+						<p>📁 release 源码：<span class="url-part">github.com/hunshcn/project/archive/v0.1.0.tar.gz</span></p>
+						<p>📂 release 文件：<span class="url-part">github.com/hunshcn/project/releases/download/v0.1.0/example.zip</span></p>
+						<p>💾 commit 文件：<span class="url-part">github.com/hunshcn/project/blob/123/filename</span></p>
+						<p>🖨️ gist：<span class="url-part">gist.githubusercontent.com/cielpy/123/raw/cmd.py</span></p>
+					</div>
 				</div>
 			</div>
 
 			<script>
+				let activeMode = 'original';
+
+				function getBaseUrl() {
+					return location.href.substr(0, location.href.lastIndexOf('/') + 1);
+				}
+
+				function normalizeInput(value) {
+					return value.trim().replace(/^\/+/, '');
+				}
+
+				function getAcceleratedUrl(value) {
+					const path = value.trim();
+					return path ? getBaseUrl() + normalizeInput(path) : '';
+				}
+
+				function getGitCloneUrl(value) {
+					const normalized = normalizeInput(value).replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+					const repoMatch = normalized.match(/^github\.com\/([^/]+\/[^/.]+)(?:\.git)?(?:\/)?$/i);
+					const path = repoMatch ? 'github.com/' + repoMatch[1] + '.git' : normalized;
+					return path ? getBaseUrl() + path : '';
+				}
+
+				function getFileName(value) {
+					const cleanValue = normalizeInput(value).split(/[?#]/)[0].replace(/\/+$/, '');
+					const name = cleanValue.substring(cleanValue.lastIndexOf('/') + 1);
+					return name || 'download';
+				}
+
+				function getOutput(value) {
+					if (activeMode === 'clone') {
+						const url = getGitCloneUrl(value);
+						return {
+							title: 'Git Clone 命令',
+							text: url ? 'git clone ' + url : '',
+							type: 'code',
+						};
+					}
+
+					const url = getAcceleratedUrl(value);
+					if (activeMode === 'download') {
+						const fileName = getFileName(value);
+						return {
+							title: 'Wget / cURL 命令',
+							text: url ? 'wget -O "' + fileName + '" "' + url + '"\\n' + 'curl -L -o "' + fileName + '" "' + url + '"' : '',
+							type: 'code',
+						};
+					}
+
+					return {
+						title: '生成后的 URL',
+						text: url,
+						type: 'link',
+					};
+				}
+
+				function updateUrlPreview() {
+					const input = document.getElementsByName('q')[0];
+					const preview = document.getElementById('urlPreview');
+					const output = getOutput(input.value);
+
+					const title = document.createElement('strong');
+					title.textContent = output.title;
+
+					if (output.text && output.type === 'link') {
+						const link = document.createElement('a');
+						link.href = output.text;
+						link.target = '_blank';
+						link.rel = 'noopener noreferrer';
+						link.textContent = output.text;
+						preview.replaceChildren(title, link);
+					} else if (output.text) {
+						const code = document.createElement('pre');
+						code.textContent = output.text;
+						preview.replaceChildren(title, code);
+					} else {
+						const placeholder = document.createElement('span');
+						placeholder.textContent = '输入 GitHub 链接后将在这里显示';
+						preview.replaceChildren(title, placeholder);
+					}
+				}
+
 				function toSubmit(e) {
 					e.preventDefault();
-					const input = document.getElementsByName('q')[0];
-					const baseUrl = location.href.substr(0, location.href.lastIndexOf('/') + 1);
-					window.open(baseUrl + input.value);
+					updateUrlPreview();
 				}
+
+				document.getElementsByName('q')[0].addEventListener('input', updateUrlPreview);
+				document.querySelectorAll('.mode-tab').forEach(button => {
+					button.addEventListener('click', () => {
+						activeMode = button.dataset.mode;
+						document.querySelectorAll('.mode-tab').forEach(item => item.classList.toggle('active', item === button));
+						updateUrlPreview();
+					});
+				});
+				updateUrlPreview();
 			</script>
 		</body>
 		</html>
